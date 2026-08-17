@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Memory Battle 💜</title>
+<script src="peerjs.min.js"></script>
+<link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+
+<div id="error-banner"><span id="error-banner-text"></span><span class="err-close" id="error-banner-close">✕</span></div>
+<div id="bg-particles"></div>
+<div id="audio-widget"><button id="btn-mute" title="Mute/Unmute">🔊</button></div>
+<div id="confetti-layer"></div>
+
+<audio id="audio-bg" loop src="backsound.mp3"></audio>
+<audio id="audio-draw" src="draw.mp3"></audio>
+<audio id="audio-play" src="play.mp3"></audio>
+<audio id="audio-hit" src="hit.mp3"></audio>
+<audio id="audio-heal" src="heal.mp3"></audio>
+<audio id="audio-counter" src="counter.mp3"></audio>
+
+<div id="app">
+
+  <!-- ===================== LOBBY ===================== -->
+  <section id="screen-lobby" class="screen active">
+    <h1 class="title">💜 Our Memory Battle 💜</h1>
+    <p class="subtitle">Deck-Building Card Battle · LDR Anniversary Edition</p>
+    <p style="font-size:10px;color:var(--text-dim);opacity:.5;margin:-24px 0 24px;">build v4</p>
+
+    <div class="lobby-options" id="lobby-main">
+      <div class="option-card glass" id="opt-bubby">
+        <span class="emoji">👑</span>
+        <h3>Aku "Bubby"</h3>
+        <p>Buka room dan tunggu Hunny bergabung — tidak perlu kode apapun.</p>
+      </div>
+      <div class="option-card glass" id="opt-hunny">
+        <span class="emoji">🌹</span>
+        <h3>Aku "Hunny"</h3>
+        <p>Langsung tekan, otomatis tersambung ke room Bubby — tidak perlu kode apapun.</p>
+      </div>
+      <div class="option-card glass" id="opt-solo">
+        <span class="emoji">📖</span>
+        <h3>Sedang Sendiri</h3>
+        <p>Buka katalog kartu, kenang semua momen... dan cari kejutan di dasar pack.</p>
+      </div>
+    </div>
+
+    <div id="panel-bubby" class="panel glass hidden">
+      <h3>👑 Room Bubby</h3>
+      <p class="status-line" id="bubby-status">Membuat room...</p>
+      <button class="btn small secondary hidden" id="btn-retry-bubby">Coba Lagi</button>
+      <div class="back-link" id="back-from-bubby">← Kembali</div>
+    </div>
+
+    <div id="panel-hunny" class="panel glass hidden">
+      <h3>🌹 Menghubungkan ke Bubby</h3>
+      <p class="status-line" id="hunny-status">Menghubungkan...</p>
+      <button class="btn small secondary hidden" id="btn-retry-hunny">Coba Lagi</button>
+      <button class="btn-surat-link" id="btn-surat-link" onclick="window.location.href='surat.html';">
+        Bubu belum masuk? Tap di sini untuk langsung baca Surat Utama 💌
+      </button>
+      <div class="back-link" id="back-from-hunny">← Kembali</div>
+    </div>
+  </section>
+
+  <!-- ===================== GAME SCREEN ===================== -->
+  <section id="screen-game" class="screen">
+    <div class="top-bar">
+      <div class="player-hp glass" id="hp-hunny">
+        <div class="name"><span>🌹 Hunny</span><span id="hp-hunny-num">150/150</span></div>
+        <div class="hp-bar-bg"><div class="hp-bar-fill" id="hp-hunny-bar" style="width:100%"></div></div>
+      </div>
+      <div class="turn-indicator glass" id="turn-indicator">Giliran: -</div>
+      <div class="player-hp glass" id="hp-bubby">
+        <div class="name"><span>👑 Bubby</span><span id="hp-bubby-num">150/150</span></div>
+        <div class="hp-bar-bg"><div class="hp-bar-fill" id="hp-bubby-bar" style="width:100%"></div></div>
+      </div>
+    </div>
+
+    <div class="deck-info">
+      <span>🂠 Sisa Deck: <b id="deck-count">40</b></span>
+      <span>✋ Kartu di tangan: <b id="hand-count">3</b></span>
+    </div>
+
+    <div class="battle-log glass" id="battle-log"></div>
+
+    <div id="pending-panel" class="glass">
+      <h4 id="pending-title">⚔️ Serangan Masuk!</h4>
+      <p id="pending-desc" style="font-size:13px;color:var(--text-dim);"></p>
+      <div class="btns" id="pending-btns"></div>
+    </div>
+
+    <div class="hand-area" id="hand-area"></div>
+  </section>
+
+  <!-- ===================== ENDING SCREEN ===================== -->
+  <section id="screen-ending" class="screen">
+    <div class="glass">
+      <h1 class="title" style="font-size:28px;">🏆 Game Selesai!</h1>
+      <p id="ending-winner" style="margin:14px 0;font-size:18px;color:var(--gold);"></p>
+      <p id="ending-hp" style="margin-bottom:14px;color:var(--text-dim);font-size:13px;"></p>
+      <p style="margin:18px 0;line-height:1.6;">yeyyy game telah selesai, bagaimana perasaan kalian? dan di tunggu yaaa pack pack selanjutnya</p>
+      <a class="btn" href="surat.html">Baca Surat Ucapan Khusus ❤️</a>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===================== CATALOG MODAL (Mode Sendiri) ===================== -->
+<div class="modal" id="modal-catalog">
+  <div class="modal-box glass">
+    <span class="modal-close" id="close-catalog">✕</span>
+    <h2 style="color:var(--gold);">📖 Katalog Kartu</h2>
+    <p style="color:var(--text-dim);font-size:13px;margin-top:4px;">Scroll terus sampai paling bawah untuk menemukan sesuatu yang spesial...</p>
+    <div class="catalog-grid" id="catalog-grid"></div>
+  </div>
+</div>
+
+<!-- ===================== HIDDEN GEM MODAL ===================== -->
+<div class="modal hiddengem-modal" id="modal-hiddengem">
+  <div class="modal-box glass">
+    <span class="modal-close" id="close-hiddengem">✕</span>
+    <div class="hiddengem-glow">💎</div>
+    <h3 style="color:var(--gold);margin-bottom:10px;">Surat Rahasia Rindu</h3>
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:18px;">Kartu Emas Spesial Rahasia! Ada sesuatu yang menunggumu...</p>
+    <a class="btn" href="secret.html">Buka Surat Rahasia dari Bubby ❤️</a>
+  </div>
+</div>
+
+<script src="game.js?v=4"></script>
+</body>
+</html>
